@@ -3,7 +3,7 @@ import random
 from enum import Enum
 
 pygame.init()
-font = pygame.font.Font("asset/PressStart2P-Regular.ttf", 17)
+font = pygame.font.Font("../../asset/PressStart2P-Regular.ttf", 17)
 
 # directions
 RIGHT = 1

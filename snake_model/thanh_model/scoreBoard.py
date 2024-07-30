@@ -9,12 +9,12 @@ class ScoreBoard(Turtle):
 	def __init__(self):
 		super().__init__()
 		self.score = 0
-		self.highest_score = 0  # save highest score to json file
+		self.highest_score = 0  # save the highest score to json file
 
 		self.color('white')
 		self.hideturtle()
 		self.penup()
-		self.goto(0, 265)
+		self.goto(0, 275)
 		self.update_score()
 
 	def update_score(self):
@@ -31,4 +31,4 @@ class ScoreBoard(Turtle):
 		self.goto(0, 0)
 		self.color('white')
 		# fix this with format
-		self.write(f"      You Lose\n Highest Score: {self.highest_score}", align=Alignment, font=(Font, 25, 'bold'))
+		self.write(f"       You Lose\n Highest Score: {self.highest_score}", align=Alignment, font=(Font, 25, 'bold'))
