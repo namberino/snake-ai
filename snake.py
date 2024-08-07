@@ -42,6 +42,19 @@ class Point:
         return f"Point({self.x}, {self.y})"
 
 
+def replay(play_again_rect):
+    # wait for the user to click play again
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if play_again_rect.collidepoint(mouse_pos):
+                    return
+
+
 class SnakeGame:
     def __init__(self, w=1040, h=680):
         self.w = w
@@ -122,37 +135,29 @@ class SnakeGame:
         self.food = None
         self._place_food()
 
+    def _render_text(self, text, font, color, center):
+        rendered_text = font.render(text, True, color)
+        text_rect = rendered_text.get_rect(center=center)
+        self.display.blit(rendered_text, text_rect)
+        return text_rect
+
     def show_game_over_screen(self, score):
         self.display.fill(BLACK)
 
-        game_over_text = font.render("GAME OVER", True, RED)
-        game_over_rect = game_over_text.get_rect(center=(self.w / 2, self.h / 2 - 50))
-        self.display.blit(game_over_text, game_over_rect)
+        self._render_text("GAME OVER", font, RED, (self.w / 2, self.h / 2 - 50))
+        self._render_text("Score: " + str(score), font, WHITE1, (self.w / 2, self.h / 2))
 
-        score_text = font.render("Score: " + str(score), True, WHITE1)
-        score_rect = score_text.get_rect(center=(self.w / 2, self.h / 2))
-        self.display.blit(score_text, score_rect)
-
+        play_again_rect = self._render_text("Play Again", font, BLACK, (self.w / 2, self.h / 2 + 50))
         play_again_text = font.render("Play Again", True, BLACK)
-        play_again_rect = play_again_text.get_rect(center=(self.w / 2, self.h / 2 + 50))
         button_rect = play_again_rect.inflate(20, 10)  # padding around the text
         pygame.draw.rect(self.display, WHITE1, button_rect)
         self.display.blit(play_again_text, play_again_rect)
 
         pygame.display.flip()
 
-        # wait for the user to click play again
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    if play_again_rect.collidepoint(mouse_pos):
-                        return
+        replay(play_again_rect)
 
-    def play(self):
+    def user_input(self):
         # user input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -169,7 +174,27 @@ class SnakeGame:
                 elif event.key == pygame.K_DOWN:
                     self.direction = DOWN
 
-        # 2. move
+    def check_if_game_over(self):
+        # 3. check if game over
+        game_over = False
+        if self._is_collision():
+            game_over = True
+            return game_over, self.score
+
+        # 4. place new food or just move
+        if self.head == self.food:
+            self.score += 1
+            self._place_food()
+        else:
+            self.snake.pop()
+
+        return game_over
+
+    def play(self):
+        # 1. Create User Input
+        self.user_input()
+
+        # 2. Update Snake Moment and Size by BLOCK
         self._move(self.direction)  # update the head
         self.snake.insert(0, self.head)
 
@@ -201,10 +226,9 @@ if __name__ == "__main__":
     while True:
         game_over, score = game.play()
 
-        if game_over == True:
+        if game_over:
             game.show_game_over_screen(score)
             game.reset()
 
     print("Final score:", score)
-
     pygame.quit()
