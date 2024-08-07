@@ -49,6 +49,8 @@ def replay(play_again_rect):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+
+            # Reset if Mouse Click is close to play again text
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if play_again_rect.collidepoint(mouse_pos):
@@ -204,14 +206,14 @@ class SnakeGame:
             game_over = True
             return game_over, self.score
 
-        # 4. place new food or just move
+            # 4. place new food or just move
         if self.head == self.food:
             self.score += 1
             self._place_food()
         else:
             self.snake.pop()
 
-        # 5. update ui and clock
+            # 5. update ui and clock
         self._update_ui()
         self.clock.tick(SPEED)
 
