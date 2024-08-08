@@ -144,23 +144,28 @@ class Agent:
     def get_action(self, state):
         """
         Returns a one-hot encoded list representing the action to take based on the given state.
+        
         Parameters:
         - state: The current state of the game.
         Returns:
         - final_move: A one-hot encoded list [0, 0, 0] where only one element is 1, indicating the direction to move.
+        Explain:
+            Random moves: tradeoff exploration / exploitation
+            if random < epsilon: explore 
+            else: exploit
         """
-        # random moves: tradeoff exploration  / exploration
+        
         self.epsilon = 69 - self.n_games  # epsilon get smaller as the game progress
 
-        # Return one-hot encoded list [0, 0, 0] where only one element is 1 indicating the direction.
         final_move = [0, 0, 0]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
-            # get raw values and convert max value into 1 other values 0.
-            state0 = torch.tensor(state, dtype=torch.float)
+            # convert raw values into tensor format and predict (torch require float tensor) 
+            state0 = torch.tensor(state, dtype=torch.float)  
             prediction = self.model.predict(state0)
+            # convert max value into 1 other values 0.
             move = torch.argmax(prediction).item()
             final_move[move] = 1
 
