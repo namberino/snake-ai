@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import pandas as pd
 import os
 
 
@@ -35,6 +36,7 @@ class QTrainer:
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=self.lr)
         self.criterion = nn.MSELoss()  # mean square error
+        self.training_log = []  # List to store training results
 
     def train_step(self, state, action, reward, next_state, done):
         state = torch.tensor(state, dtype=torch.float)
@@ -68,5 +70,33 @@ class QTrainer:
         self.optimizer.zero_grad()
         loss = self.criterion(target, pred)
         loss.backward()
-
         self.optimizer.step()
+        
+                # Log the training results
+        self.training_log.append({
+            'state': state.numpy().tolist(),
+            'action': action.numpy().tolist(),
+            'reward': reward.numpy().tolist(),
+            'next_state': next_state.numpy().tolist(),
+            'done': done,
+            'loss': loss.item()
+        })
+
+    def save_training_log(self, file_path):
+        df = pd.DataFrame(self.training_log)
+        df.to_csv(file_path, index=False)
+
+# Example usage
+if __name__ == "__main__":    
+    INPUT_SIZE = 3
+    HIDDEN_SIZE = 1
+    OUTPUT_SIZE = 3
+
+    model = Linear_QNet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)
+    trainer = QTrainer(model, lr=0.001, gamma=0.9)
+    
+    # Example training step
+    trainer.train_step([1, 2, 3], [0], 1, [4, 5, 6], False)
+    
+    # Save the training log to a CSV file
+    trainer.save_training_log('training_log.csv')
