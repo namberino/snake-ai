@@ -36,7 +36,7 @@ class Agent:
         self.epsilon = 0  #randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)  # save data to deque
-        self.model = Linear_QNet(11, 256, 3)  # 11 input, 256 hidden, 3 output
+        self.model = Linear_QNet(12, 255, 3)  # 11 input, 256 hidden, 3 output
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)  # QTrainer object
 
     def get_state(self, game):
@@ -219,7 +219,6 @@ def train():
 
             print('Game', agent.n_games, 'Score', score, 'Record:', record)
 
-            #TODO: plot
             plot_scores.append(score)
             total_score += score
             mean_scores = total_score / agent.n_games

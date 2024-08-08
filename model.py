@@ -4,6 +4,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 import os
 
+
+
 #TODO: Learn Q-Learning before Friday
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
@@ -12,6 +14,7 @@ class Linear_QNet(nn.Module):
         self.linear2 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
+        print(f"Input shape: {x.shape}")
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
         return x
@@ -23,6 +26,7 @@ class Linear_QNet(nn.Module):
         
         file_name = os.path.join(model_folder_path, file_name)
         torch.save(self.state_dict(), file_name)
+        
         
 class QTrainer:
     def __init__(self, model, lr, gamma):

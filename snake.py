@@ -174,7 +174,7 @@ class SnakeAI:
 
         replay(play_again_rect)
 
-    def play(self):
+    def play(self, action):
         self.frame_iteration += 1
 
         # 1. Check if we want to keep the game
@@ -184,7 +184,7 @@ class SnakeAI:
                 quit()
 
         # 2. Update Snake Moment and Size by BLOCK
-        self._move()  # update the head
+        self._move(action)  # update the head
         self.snake.insert(0, self.head)
 
         # 3. check if game over
