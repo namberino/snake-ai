@@ -13,11 +13,6 @@ font = pygame.font.Font("asset/PressStart2P-Regular.ttf", 17)
 # game iteration
 # is_collision
 
-# directions
-RIGHT = 1
-LEFT = 2
-UP = 3
-DOWN = 4
 
 # rgb colors
 WHITE1 = (255, 255, 255)
@@ -30,6 +25,16 @@ BLOCK_SIZE = 20
 SPEED = 10
 
 
+class Direction(Enum):
+    RIGHT = 1
+    LEFT = 2
+    UP = 3
+    DOWN = 4
+
+
+Point = namedtuple('Point', 'x, y')
+
+
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -40,16 +45,6 @@ class Point:
 
     def __repr__(self):
         return f"Point({self.x}, {self.y})"
-
-
-class Direction(Enum):
-    RIGHT = 1
-    LEFT = 2
-    UP = 3
-    DOWN = 4
-
-
-Point = namedtuple('Point', 'x, y')
 
 
 def replay(play_again_rect):
@@ -67,7 +62,7 @@ def replay(play_again_rect):
                     return
 
 
-class SnakeGame:
+class SnakeAI:
     def __init__(self, w=1040, h=680):
         self.w = w
         self.h = h
@@ -77,7 +72,7 @@ class SnakeGame:
         pygame.display.set_caption("Snake")
         self.clock = pygame.time.Clock()
 
-    def _place_food(self):
+    def _place_food(self):  #? note: _ mean private class/method
         x = random.randint(0, (self.w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
         y = random.randint(0, (self.h - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
         self.food = Point(x, y)
@@ -85,7 +80,7 @@ class SnakeGame:
         if self.food in self.snake:
             self._place_food()
 
-    def _is_collision(self, pt=None):
+    def is_collision(self, pt=None):
         if pt is None:
             pt = self.head
 
@@ -120,7 +115,7 @@ class SnakeGame:
 
         if np.array_equal(action, [1, 0, 0]):
             new_dir = clock_wise[index]  # no change
-        elif np.array_equal(action, [0, 1, 0]): # right [0, 1, 0]
+        elif np.array_equal(action, [0, 1, 0]):  # right [0, 1, 0]
             next_index = (index + 1) % 4
             new_dir = clock_wise[next_index]  # right turn r -> d -> l -> u
         else:  # left [0, 0, 1]
@@ -193,7 +188,7 @@ class SnakeGame:
         reward = 0
         game_over = False
         # Check the length of the snake through frame_iteration incase it doesn't grow
-        if self._is_collision() or self.frame_iteration > 100 * len(self.snake):
+        if self.is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
             reward = -10
             return reward, game_over, self.score
