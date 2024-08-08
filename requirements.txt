@@ -3,3 +3,5 @@ torch
 torchvision
 matplotlib
 ipython
+scikit-learn
+pandas

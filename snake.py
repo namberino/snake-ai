@@ -22,7 +22,7 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
 BLOCK_SIZE = 20
-SPEED = 10
+SPEED = 2000
 
 
 class Direction(Enum):

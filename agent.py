@@ -6,9 +6,15 @@ from snake import SnakeAI, Direction, Point
 from model import Linear_QNet, QTrainer
 from helper import plot
 
+
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
+SPEED = 20000  # Increase the frame rate
+INPUT_SIZE = 12
+HIDDEN_SIZE = 255
+OUTPUT_SIZE = 3
+
 
 
 class Agent:
@@ -19,7 +25,7 @@ class Agent:
         n_games (int): The number of games played by the agent.
         epsilon (float): The randomness factor for exploration.
         gamma (float): The discount rate for future rewards.
-        memory (deque): A deque to store game data.
+        memory (deque): A deque to store game data. (deque is a list-like container with fast appends and pops on either end)
         model (object): The model used for prediction.
         trainer (object): The trainer used for training the model.
     Methods:
@@ -29,14 +35,13 @@ class Agent:
         train_short_memory(state, action, reward, next_state, done): Trains the model using short-term memory.
         get_action(state): Returns the action to take based on the current state.
     """
-        
-          
+
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 0  #randomness
-        self.gamma = 0.9  # discount rate
+        self.epsilon = 0  
+        self.gamma = 0.9  
         self.memory = deque(maxlen=MAX_MEMORY)  # save data to deque
-        self.model = Linear_QNet(12, 255, 3)  # 11 input, 256 hidden, 3 output
+        self.model = Linear_QNet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)  # 11 input, 256 hidden, 3 output
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)  # QTrainer object
 
     def get_state(self, game):
@@ -61,7 +66,6 @@ class Agent:
         dir_l = game.direction == Direction.LEFT
         dir_u = game.direction == Direction.UP
         dir_d = game.direction == Direction.DOWN
-
 
         state = [
             # Danger straight
@@ -104,11 +108,9 @@ class Agent:
 
         return np.array(state, dtype=int)  # Turn State (True or False boolean) into 0 and 1
 
-
     def remember(self, state, action, reward, next_state, done):
         # append a list of tuple
         self.memory.append((state, action, reward, next_state, done))  # popleft if MAX_MEMORY is reached
-
 
     """
     Train_long_memory & Train short memory
@@ -123,6 +125,7 @@ class Agent:
     Returns:
         the action to take based on the current state.
     """
+
     def train_long_memory(self):
         """
         This method is responsible for training the agent using the samples stored in the long-term memory.
@@ -137,11 +140,8 @@ class Agent:
         states, actions, rewards, next_states, dones = zip(*mini_sample)  # Extract every samples existed
         self.trainer.train_step(states, actions, rewards, next_states, dones)  # Train with every samples existed
 
-
-    def train_short_memory(self, state, action, reward, next_state, done):  # 1 step    
+    def train_short_memory(self, state, action, reward, next_state, done):  # 1 step
         self.trainer.train_step(state, action, reward, next_state, done)
-
-
 
     def get_action(self, state):
         """
@@ -156,7 +156,7 @@ class Agent:
             if random < epsilon: explore 
             else: exploit
         """
-        
+
         self.epsilon = 69 - self.n_games  # epsilon get smaller as the game progress
 
         final_move = [0, 0, 0]
@@ -165,13 +165,15 @@ class Agent:
             final_move[move] = 1
         else:
             # convert raw values into tensor format and predict (torch require float tensor) 
-            state0 = torch.tensor(state, dtype=torch.float)  
+            state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             # convert max value into 1 other values 0.
             move = torch.argmax(prediction).item()
             final_move[move] = 1
 
         return final_move
+    
+    
 
 
 def train():
@@ -181,8 +183,7 @@ def train():
     It keeps track of the scores and records, and updates the agent's memory for training.
     After each game, it resets the snake game and trains the agent's long-term memory.
     """
-    
-    
+
     plot_scores = []
     plot_mean_scores = []
     total_score = 0
@@ -224,7 +225,16 @@ def train():
             mean_scores = total_score / agent.n_games
             plot_mean_scores.append(mean_scores)
             plot(plot_scores, plot_mean_scores)
-            
+
 
 if __name__ == '__main__':
+    # Create an instance of your model
+    model = Linear_QNet(12, 255, 3)
+
+    # Load the state dictionary from the file
+    model.load_state_dict(torch.load('./model/model.pth'))
+
+    # Set the model to evaluation mode (optional, but recommended for inference)
+    model.eval()
+
     train()
