@@ -2,8 +2,6 @@ import torch
 import random
 import numpy as np
 from collections import deque  # use to store data
-
-import snake
 from snake import SnakeAI, Direction, Point
 
 MAX_MEMORY = 100_000
