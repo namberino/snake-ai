@@ -71,6 +71,9 @@ class SnakeAI:
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption("Snake")
         self.clock = pygame.time.Clock()
+        
+        #Initialize game state
+        self.reset()    
 
     def _place_food(self):  #? note: _ mean private class/method
         x = random.randint(0, (self.w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
@@ -85,7 +88,7 @@ class SnakeAI:
             pt = self.head
 
         # hit boundary
-        if pt.x > pt.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
+        if pt.x > self.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
             return True
 
         # hits itself

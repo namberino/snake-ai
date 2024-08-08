@@ -1,4 +1,4 @@
-pygame
+chapygame
 torch
 torchvision
 matplotlib

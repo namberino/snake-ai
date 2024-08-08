@@ -3,6 +3,8 @@ import random
 import numpy as np
 from collections import deque  # use to store data
 from snake import SnakeAI, Direction, Point
+from model import Linear_QNet, QTrainer
+from helper import plot
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -31,11 +33,11 @@ class Agent:
           
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 0  #randomness?
-        self.gamma = 0  # discount rate?
+        self.epsilon = 0  #randomness
+        self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)  # save data to deque
-        self.model = None
-        self.trainer = None
+        self.model = Linear_QNet(11, 256, 3)  # 11 input, 256 hidden, 3 output
+        self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)  # QTrainer object
 
     def get_state(self, game):
         """
@@ -50,8 +52,8 @@ class Agent:
         """
 
         head = game.snake[0]
-        point_l = Point(head.x + 20, head.y)
-        point_r = Point(head.x - 20, head.y)
+        point_r = Point(head.x + 20, head.y)
+        point_l = Point(head.x - 20, head.y)
         point_u = Point(head.x, head.y - 20)
         point_d = Point(head.x, head.y + 20)
 
@@ -125,7 +127,7 @@ class Agent:
         """
         This method is responsible for training the agent using the samples stored in the long-term memory.
         If the number of samples in the memory is greater than the batch size, a mini-batch of size BATCH_SIZE is randomly selected.
-        Otherwise, all the samples in the memory are used.
+        Otherwise, all the samples i n the memory are used.
         """
         if len(self.memory) > BATCH_SIZE:  # if have more than BATCH_SIZE samples
             mini_sample = random.sample(self.memory, BATCH_SIZE)  # list of tuples
@@ -164,7 +166,7 @@ class Agent:
         else:
             # convert raw values into tensor format and predict (torch require float tensor) 
             state0 = torch.tensor(state, dtype=torch.float)  
-            prediction = self.model.predict(state0)
+            prediction = self.model(state0)
             # convert max value into 1 other values 0.
             move = torch.argmax(prediction).item()
             final_move[move] = 1
@@ -179,8 +181,8 @@ def train():
     It keeps track of the scores and records, and updates the agent's memory for training.
     After each game, it resets the snake game and trains the agent's long-term memory.
     """
-    # code implementation
-    ...
+    
+    
     plot_scores = []
     plot_mean_scores = []
     total_score = 0
@@ -195,7 +197,7 @@ def train():
         # get move
         final_move = agent.get_action(state_old)
 
-        # perform move andd get new state
+        # perform move and get new state
         reward, done, score = snake.play(final_move)
         state_new = agent.get_state(snake)
 
@@ -212,13 +214,18 @@ def train():
             agent.train_long_memory()
 
             if score > record:
-                reward = score
-                # agent.mode.save()
+                record = score
+                agent.model.save()
 
             print('Game', agent.n_games, 'Score', score, 'Record:', record)
 
             #TODO: plot
-
+            plot_scores.append(score)
+            total_score += score
+            mean_scores = total_score / agent.n_games
+            plot_mean_scores.append(mean_scores)
+            plot(plot_scores, plot_mean_scores)
+            
 
 if __name__ == '__main__':
     train()
