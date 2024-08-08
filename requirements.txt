@@ -1,5 +1,7 @@
-pygame
+chapygame
 torch
 torchvision
 matplotlib
 ipython
+scikit-learn
+pandas
