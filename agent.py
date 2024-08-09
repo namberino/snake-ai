@@ -39,15 +39,15 @@ class Agent:
     """
 
     def __init__(self):
-        self.use_old = False
+        self.use_old = True # use old data or not
         self.n_games = 0
         self.epsilon = 0  
         self.gamma = 0.9  
         self.memory = deque(maxlen=MAX_MEMORY)  # save data to deque
         self.model = Linear_QNet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)  # 11 input, 256 hidden, 3 output
 
-        if os.path.exists("./model/model.pth") and len(ARGS) == 2 and str(ARGS[1]) == 'load':
-            self.model.load_state_dict(torch.load('./model/model.pth'))
+        if os.path.exists("./model/model2.pth") and len(ARGS) == 2 and str(ARGS[1]) == 'load':
+            self.model.load_state_dict(torch.load('./model/model2.pth'))
             self.model.eval()
             self.use_old = True
 
@@ -76,6 +76,7 @@ class Agent:
         dir_u = game.direction == Direction.UP
         dir_d = game.direction == Direction.DOWN
 
+        
         state = [
             # Danger straight
             (dir_r and game.is_collision(point_r)) or
@@ -181,7 +182,7 @@ class Agent:
                 prediction = self.model(state0)
                 move = torch.argmax(prediction).item()
                 final_move[move] = 1
-        else:
+        else:   
             # load-time training data
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
@@ -189,14 +190,14 @@ class Agent:
             final_move[move] = 1
 
         return final_move
-    
+
 
 def train():
     """
-    Trains the snake AI agent by playing the snake game.
-    This function iteratively plays the snake game and trains the agent's neural network model.
-    It keeps track of the scores and records, and updates the agent's memory for training.
-    After each game, it resets the snake game and trains the agent's long-term memory.
+        Trains the snake AI agent by playing the snake game.
+        This function iteratively plays the snake game and trains the agent's neural network model.
+        It keeps track of the scores and records, and updates the agent's memory for training.
+        After each game, it resets the snake game and trains the agent's long-term memory.  
     """
 
     plot_scores = []

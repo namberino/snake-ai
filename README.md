@@ -19,7 +19,7 @@ Install Requirement: pip install -r requirements.txt
 Run agent.py file
 
 Markdown Preview: Ctr + Shift + V
-
+ 
 
 # Documentation (On Development)
 ## Functions
@@ -33,9 +33,13 @@ In reinforcement learning, it is common to have a tradeoff between exploration a
 + On the other hand, if the randomly generated number is greater than or equal to the exploration rate, the else statement is executed. In this case, the agent uses its learned knowledge to predict the action with the highest expected reward. The state is converted into a tensor format and passed to the predict method of the self.model object. The predicted action is then determined by finding the index of the maximum value in the prediction tensor using torch.argmax. The corresponding element in the final_move list is set to 1, indicating the chosen action.
 
 
-
 ## Algorithm
 ### Q-Learning
 ### Deep Q-Learning
 
 
+# TO-DO:
++ Extract Feature for Evolution Algorithm
++ Implement Genetic Algorithm
++ Create a file for Natural Selection 
+ 

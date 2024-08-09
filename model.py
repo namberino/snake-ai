@@ -20,7 +20,7 @@ class Linear_QNet(nn.Module):
         return x
 
     #? Save Training Result to model.pth (pytorch file format) 
-    def save(self, file_name='model.pth'):
+    def save(self, file_name='model2.pth'):
         model_folder_path = './model'
         if not os.path.exists(model_folder_path):
             os.makedirs(model_folder_path)
@@ -60,7 +60,7 @@ class QTrainer:
         for index in range(len(done)):
             Q_new = reward[index]
             if not done[index]:
-                Q_new = reward[index] + self.gamma * torch.max(self.model(next_state[index]))
+                Q_new = reward[index] + self.gamma * torch.max(self.model(next_state[index])) # Q-Learning formula
 
             target[index][torch.argmax(action[index]).item()] = Q_new
 
@@ -100,3 +100,7 @@ if __name__ == "__main__":
     
     # Save the training log to a CSV file
     trainer.save_training_log('training_log.csv')
+    
+    
+    
+    
