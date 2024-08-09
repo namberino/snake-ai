@@ -5,6 +5,8 @@ from collections import deque  # use to store data
 from snake import SnakeAI, Direction, Point
 from model import Linear_QNet, QTrainer
 from helper import plot
+import os
+import sys
 
 
 MAX_MEMORY = 100_000
@@ -15,7 +17,7 @@ INPUT_SIZE = 12
 HIDDEN_SIZE = 255
 OUTPUT_SIZE = 3
 
-
+ARGS = sys.argv
 
 class Agent:
     """
@@ -37,11 +39,18 @@ class Agent:
     """
 
     def __init__(self):
+        self.use_old = False
         self.n_games = 0
         self.epsilon = 0  
         self.gamma = 0.9  
         self.memory = deque(maxlen=MAX_MEMORY)  # save data to deque
         self.model = Linear_QNet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)  # 11 input, 256 hidden, 3 output
+
+        if os.path.exists("./model/model.pth") and len(ARGS) == 2 and str(ARGS[1]) == 'load':
+            self.model.load_state_dict(torch.load('./model/model.pth'))
+            self.model.eval()
+            self.use_old = True
+
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)  # QTrainer object
 
     def get_state(self, game):
@@ -160,14 +169,30 @@ class Agent:
         self.epsilon = 69 - self.n_games  # epsilon get smaller as the game progress
 
         final_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
-            final_move[move] = 1
+        # if random.randint(0, 200) < self.epsilon:
+        #     move = random.randint(0, 2)
+        #     final_move[move] = 1
+        # else:
+        #     # convert raw values into tensor format and predict (torch require float tensor) 
+        #     state0 = torch.tensor(state, dtype=torch.float)
+        #     prediction = self.model(state0)
+        #     # convert max value into 1 other values 0.
+        #     move = torch.argmax(prediction).item()
+        #     final_move[move] = 1
+
+        if self.use_old == False:
+            self.epsilon = 80 - self.n_games
+            if random.randint(0, 200) < self.epsilon:
+                move = random.randint(0, 2)
+                final_move[move] = 1
+            else:
+                state0 = torch.tensor(state, dtype=torch.float)
+                prediction = self.model(state0)
+                move = torch.argmax(prediction).item()
+                final_move[move] = 1
         else:
-            # convert raw values into tensor format and predict (torch require float tensor) 
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
-            # convert max value into 1 other values 0.
             move = torch.argmax(prediction).item()
             final_move[move] = 1
 
