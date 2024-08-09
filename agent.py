@@ -169,18 +169,9 @@ class Agent:
         self.epsilon = 69 - self.n_games  # epsilon get smaller as the game progress
 
         final_move = [0, 0, 0]
-        # if random.randint(0, 200) < self.epsilon:
-        #     move = random.randint(0, 2)
-        #     final_move[move] = 1
-        # else:
-        #     # convert raw values into tensor format and predict (torch require float tensor) 
-        #     state0 = torch.tensor(state, dtype=torch.float)
-        #     prediction = self.model(state0)
-        #     # convert max value into 1 other values 0.
-        #     move = torch.argmax(prediction).item()
-        #     final_move[move] = 1
 
         if self.use_old == False:
+            # run-time training data
             self.epsilon = 80 - self.n_games
             if random.randint(0, 200) < self.epsilon:
                 move = random.randint(0, 2)
@@ -191,6 +182,7 @@ class Agent:
                 move = torch.argmax(prediction).item()
                 final_move[move] = 1
         else:
+            # load-time training data
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
@@ -198,8 +190,6 @@ class Agent:
 
         return final_move
     
-    
-
 
 def train():
     """
