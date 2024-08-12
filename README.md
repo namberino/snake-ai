@@ -1,3 +1,7 @@
+# Snake AI
+
+![](./asset/training.gif)
+
 # Files
 **agent.py:** Contains the Agent class, which implements the Q-learning algorithm to train the agent to play the game.
 
