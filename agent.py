@@ -243,14 +243,16 @@ def train():
             plot(plot_scores, plot_mean_scores)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create an instance of your model
     model = Linear_QNet(12, 255, 3)
 
     # Load the state dictionary from the file
-    model.load_state_dict(torch.load('./model/model.pth'))
+    model_path = "./model/best_genetic_model.pth"
+    if os.path.exists(model_path):
+        model.load_state_dict(torch.load(model_path))
 
-    # Set the model to evaluation mode (optional, but recommended for inference)
-    model.eval()
+        # Set the model to evaluation mode (optional, but recommended for inference)
+        model.eval()
 
     train()

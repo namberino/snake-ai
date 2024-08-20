@@ -99,7 +99,7 @@ if __name__ == "__main__":
     trainer.train_step([1, 2, 3], [0], 1, [4, 5, 6], False)
     
     # Save the training log to a CSV file
-    trainer.save_training_log('training_log.csv')
+    trainer.save_training_log('training_logs/training_log.csv')
     
     
     

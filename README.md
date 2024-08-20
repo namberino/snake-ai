@@ -35,11 +35,28 @@ In reinforcement learning, it is common to have a tradeoff between exploration a
 
 ## Algorithm
 ### Q-Learning
+Q-Learning is a model-free reinforcement learning algorithm used to learn the value of an action in a particular state. It aims to find the optimal action-selection policy for a given finite Markov decision process (MDP).
+
+1. Core Concepts:
+* **State (s):** The current situation of the agent.
+* **Action (a):** The set of all possible actions the agent can take in a state.
+* **Reward (r):** The immediate return received after transitioning from one state to another.
+* **Q-Value (Q):** The expected future reward of taking a particular action in a given state and following the optimal policy thereafter.
+
+2. The Q-Learning Equation:
+
+The Q-value for a state-action pair is updated using the following equation:
+$$Q(s,a)←Q(s,a)+α[r+γ⋅max⁡a′Q(s′,a′)−Q(s,a)]$$
+
+Where:
+
+* $α$ (Learning Rate): The extent to which newly acquired information overrides the old information.
+* $γ$ (Discount Factor): The degree to which future rewards are considered. A value of 0 means only immediate rewards are considered, while a value close to 1 means future rewards are highly regarded.
+* $r$: The reward received after taking action aa in state s.
+* $s′$: The next state after taking action a.
+* $max_{a′}​Q(s′,a′)$: The maximum expected future reward for the next state s′ across all possible actions a′.
+
 ### Deep Q-Learning
 
 
-# TO-DO:
-+ Extract Feature for Evolution Algorithm
-+ Implement Genetic Algorithm
-+ Create a file for Natural Selection 
- 
+### Genetic Algorithm
