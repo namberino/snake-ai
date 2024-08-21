@@ -9,14 +9,14 @@ import os
 import sys
 
 
-MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
-LR = 0.001
+MAX_MEMORY = 200_000 # Store n samples. 
+BATCH_SIZE = 1000 # n samples in a batch. 
+LR = 0.0001  # Learning Rate
 SPEED = 20000  # Increase the frame rate
 INPUT_SIZE = 12
-HIDDEN_SIZE = 255
+HIDDEN_SIZE1 = 256
 OUTPUT_SIZE = 3
-
+FILE_PATH = 'model/model4.pth'
 ARGS = sys.argv
 
 class Agent:
@@ -44,10 +44,10 @@ class Agent:
         self.epsilon = 0  
         self.gamma = 0.9  
         self.memory = deque(maxlen=MAX_MEMORY)  # save data to deque
-        self.model = Linear_QNet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)  # 11 input, 256 hidden, 3 output
+        self.model = Linear_QNet(INPUT_SIZE, HIDDEN_SIZE1, OUTPUT_SIZE)  # 11 input, 256 hidden, 3 output
 
-        if os.path.exists("./model/model.pth") and len(ARGS) == 2 and str(ARGS[1]) == 'load':
-            self.model.load_state_dict(torch.load('./model/model.pth'))
+        if os.path.exists(FILE_PATH) and len(ARGS) == 2 and str(ARGS[1]) == 'load':
+            self.model.load_state_dict(torch.load(FILE_PATH))
             self.model.eval()
             self.use_old = True
 
@@ -181,7 +181,7 @@ class Agent:
         #     final_move[move] = 1
 
         if self.use_old == False:
-            self.epsilon = 80 - self.n_games
+            self.epsilon = 69 - self.n_games
             if random.randint(0, 200) < self.epsilon:
                 move = random.randint(0, 2)
                 final_move[move] = 1
@@ -254,10 +254,10 @@ def train():
 
 if __name__ == '__main__':
     # Create an instance of your model
-    model = Linear_QNet(12, 255, 3)
+    model = Linear_QNet(12, HIDDEN_SIZE1, 3)
 
     # Load the state dictionary from the file
-    model.load_state_dict(torch.load('./model/model.pth'))
+    # model.load_state_dict(torch.load(FILE_PATH))
 
     # Set the model to evaluation mode (optional, but recommended for inference)
     model.eval()

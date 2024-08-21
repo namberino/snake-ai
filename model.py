@@ -4,22 +4,23 @@ import torch.optim as optim
 import torch.nn.functional as F
 import os
 
+FILE_PATH = 'model3.pth'
 
 #TODO: Learn How to Modify Q-Learning 
 class Linear_QNet(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, input_size, hidden_size1, output_size):
         super().__init__()
-        self.linear1 = nn.Linear(input_size, hidden_size)
-        self.linear2 = nn.Linear(hidden_size, output_size)
+        self.linear1 = nn.Linear(input_size, hidden_size1)
+        self.linear2 = nn.Linear(hidden_size1, output_size)
 
     def forward(self, x):
         print(f"Input shape: {x.shape}")
-        x = F.relu(self.linear1(x))
+        x = F.relu(self.linear1(x))  # Apply ReLU activation after the first linear layer
         x = self.linear2(x)
         return x
 
     #? Save Training Result to model.pth (pytorch file format) 
-    def save(self, file_name='model.pth'):
+    def save(self, file_name=FILE_PATH):
         model_folder_path = './model'
         if not os.path.exists(model_folder_path):
             os.makedirs(model_folder_path)
