@@ -2,7 +2,7 @@ import torch
 import random
 import numpy as np
 from collections import deque  # use to store data
-from snake import SnakeAI, Direction, Point
+from snake import SnakeAI, Direction, Point, BLOCK_SIZE
 from model import Linear_QNet, QTrainer
 from helper import plot
 import os
@@ -13,7 +13,7 @@ MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
 SPEED = 20000  # Increase the frame rate
-INPUT_SIZE = 12
+INPUT_SIZE = 16
 HIDDEN_SIZE = 255
 OUTPUT_SIZE = 3
 
@@ -113,6 +113,12 @@ class Agent:
             game.food.x > game.head.x,  # food right
             game.food.y > game.head.y,  # food up
             game.food.y < game.head.y,  # food down
+
+            # Potential traps (future collision if snake moves in this direction)
+            game.is_collision(Point(head.x + 2 * BLOCK_SIZE, head.y)) if dir_r else 0,
+            game.is_collision(Point(head.x - 2 * BLOCK_SIZE, head.y)) if dir_l else 0,
+            game.is_collision(Point(head.x, head.y - 2 * BLOCK_SIZE)) if dir_u else 0,
+            game.is_collision(Point(head.x, head.y + 2 * BLOCK_SIZE)) if dir_d else 0
         ]
 
         return np.array(state, dtype=int)  # Turn State (True or False boolean) into 0 and 1
@@ -169,31 +175,24 @@ class Agent:
         self.epsilon = 69 - self.n_games  # epsilon get smaller as the game progress
 
         final_move = [0, 0, 0]
-        # if random.randint(0, 200) < self.epsilon:
-        #     move = random.randint(0, 2)
-        #     final_move[move] = 1
-        # else:
-        #     # convert raw values into tensor format and predict (torch require float tensor) 
-        #     state0 = torch.tensor(state, dtype=torch.float)
-        #     prediction = self.model(state0)
-        #     # convert max value into 1 other values 0.
-        #     move = torch.argmax(prediction).item()
-        #     final_move[move] = 1
 
-        if self.use_old == False:
-            self.epsilon = 80 - self.n_games
-            if random.randint(0, 200) < self.epsilon:
-                move = random.randint(0, 2)
-                final_move[move] = 1
-            else:
-                state0 = torch.tensor(state, dtype=torch.float)
-                prediction = self.model(state0)
-                move = torch.argmax(prediction).item()
-                final_move[move] = 1
+        if not self.use_old and random.randint(0, 200) < self.epsilon:
+            # self.epsilon = 80 - self.n_games
+            move = random.randint(0, 2)
+            final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
+
+            # Prevent moves leading to dead ends
+            if state[0] and move == 0:  # Danger straight
+                move = random.choice([1, 2])
+            elif state[1] and move == 1:  # Danger right
+                move = random.choice([0, 2])
+            elif state[2] and move == 2:  # Danger left
+                move = random.choice([0, 1])
+
             final_move[move] = 1
 
         return final_move
@@ -257,7 +256,7 @@ if __name__ == '__main__':
     model = Linear_QNet(12, 255, 3)
 
     # Load the state dictionary from the file
-    model.load_state_dict(torch.load('./model/model.pth'))
+    # model.load_state_dict(torch.load('./model/model.pth'))
 
     # Set the model to evaluation mode (optional, but recommended for inference)
     model.eval()

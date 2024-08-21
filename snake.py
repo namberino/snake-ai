@@ -7,13 +7,6 @@ import numpy as np
 pygame.init()
 font = pygame.font.Font("asset/PressStart2P-Regular.ttf", 17)
 
-# reset
-# reward
-# play(action) -> direction
-# game iteration
-# is_collision
-
-
 # rgb colors
 WHITE1 = (255, 255, 255)
 WHITE2 = (200, 200, 200)
