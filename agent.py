@@ -13,8 +13,8 @@ MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
 SPEED = 20000  # Increase the frame rate
-INPUT_SIZE = 12
-HIDDEN_SIZE = 255
+INPUT_SIZE = 17
+HIDDEN_SIZE = 500
 OUTPUT_SIZE = 3
 
 ARGS = sys.argv
@@ -108,11 +108,20 @@ class Agent:
             dir_u,
             dir_d,
 
-            # Food Location (start from head location)
+            # Red ood Location (start from head location)
             game.food.x < game.head.x,  # food left
             game.food.x > game.head.x,  # food right
             game.food.y > game.head.y,  # food up
             game.food.y < game.head.y,  # food down
+
+            # Yellow food Location (start from head location)
+            game.yellow_food.x < game.head.x,  # food left
+            game.yellow_food.x > game.head.x,  # food right
+            game.yellow_food.y > game.head.y,  # food up
+            game.yellow_food.y < game.head.y,  # food down
+
+            # Current snake length to determine if shrinking is beneficial
+            len(game.snake) > 5
         ]
 
         return np.array(state, dtype=int)  # Turn State (True or False boolean) into 0 and 1
@@ -257,7 +266,7 @@ if __name__ == '__main__':
     model = Linear_QNet(12, 255, 3)
 
     # Load the state dictionary from the file
-    model.load_state_dict(torch.load('./model/model.pth'))
+    # model.load_state_dict(torch.load('./model/model.pth'))
 
     # Set the model to evaluation mode (optional, but recommended for inference)
     model.eval()

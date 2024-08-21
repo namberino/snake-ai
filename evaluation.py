@@ -18,11 +18,7 @@ model.load_state_dict(model_dict)
 # Set the model to evaluation mode
 model.eval()
 
-# Assuming you have a dataset and a DataLoader
-dataset = YourDataset('path/to/your/evaluation/data')
-dataloader = DataLoader(dataset, batch_size=32, shuffle=False)
-
-# Example evaluation function
+# Evaluation function
 def evaluate_model(model, dataloader):
     model.eval()
     all_preds = []
@@ -42,5 +38,3 @@ def evaluate_model(model, dataloader):
 # Perform evaluation on your data
 accuracy = evaluate_model(model, dataloader)
 print(f'Accuracy: {accuracy:.4f}')
-
-# Note: Uncomment the dataset and dataloader lines and replace 'YourDataset' with your actual dataset class.

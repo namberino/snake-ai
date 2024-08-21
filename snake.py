@@ -7,17 +7,11 @@ import numpy as np
 pygame.init()
 font = pygame.font.Font("asset/PressStart2P-Regular.ttf", 17)
 
-# reset
-# reward
-# play(action) -> direction
-# game iteration
-# is_collision
-
-
 # rgb colors
 WHITE1 = (255, 255, 255)
 WHITE2 = (200, 200, 200)
 RED = (200, 0, 0)
+YELLOW = (255, 255, 0)  # New color for the yellow food
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
@@ -73,14 +67,18 @@ class SnakeAI:
         self.clock = pygame.time.Clock()
         
         #Initialize game state
-        self.reset()    
+        self.reset()
 
-    def _place_food(self):  #? note: _ mean private class/method
+    def _place_food(self):
         x = random.randint(0, (self.w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
         y = random.randint(0, (self.h - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
         self.food = Point(x, y)
 
-        if self.food in self.snake:
+        x = random.randint(0, (self.w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
+        y = random.randint(0, (self.h - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
+        self.yellow_food = Point(x, y)
+
+        if self.food in self.snake or self.yellow_food in self.snake or self.food == self.yellow_food:
             self._place_food()
 
     def is_collision(self, pt=None):
@@ -105,6 +103,7 @@ class SnakeAI:
             pygame.draw.rect(self.display, WHITE1, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
 
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
+        pygame.draw.rect(self.display, YELLOW, pygame.Rect(self.yellow_food.x, self.yellow_food.y, BLOCK_SIZE, BLOCK_SIZE))
 
         text = font.render(str(self.score), True, WHITE1)
         text_rect = text.get_rect(center=(self.w / 2, 25))
@@ -117,13 +116,13 @@ class SnakeAI:
         index = clock_wise.index(self.direction)  # track snake direction in clockwise
 
         if np.array_equal(action, [1, 0, 0]):
-            new_dir = clock_wise[index]  # no change
-        elif np.array_equal(action, [0, 1, 0]):  # right [0, 1, 0]
+            new_dir = clock_wise[index]
+        elif np.array_equal(action, [0, 1, 0]):
             next_index = (index + 1) % 4
-            new_dir = clock_wise[next_index]  # right turn r -> d -> l -> u
-        else:  # left [0, 0, 1]
+            new_dir = clock_wise[next_index]
+        else:
             next_index = (index - 1) % 4
-            new_dir = clock_wise[next_index]  # left turn r -> u -> l -> d
+            new_dir = clock_wise[next_index]
 
         self.direction = new_dir
 
@@ -141,14 +140,14 @@ class SnakeAI:
         self.head = Point(x, y)
 
     def reset(self):
-        # init game state
-        self.direction = Direction.RIGHT  # Ini Direction
+        self.direction = Direction.RIGHT
         self.head = Point(self.w / 2, self.h / 2)
         self.snake = [self.head,
                       Point(self.head.x - BLOCK_SIZE, self.head.y),
                       Point(self.head.x - (2 * BLOCK_SIZE), self.head.y)]
         self.score = 0
         self.food = None
+        self.yellow_food = None
         self._place_food()
         self.frame_iteration = 0
 
@@ -166,7 +165,7 @@ class SnakeAI:
 
         play_again_rect = self._render_text("Play Again", font, BLACK, (self.w / 2, self.h / 2 + 50))
         play_again_text = font.render("Play Again", True, BLACK)
-        button_rect = play_again_rect.inflate(20, 10)  # padding around the text
+        button_rect = play_again_rect.inflate(20, 10)
         pygame.draw.rect(self.display, WHITE1, button_rect)
         self.display.blit(play_again_text, play_again_rect)
 
@@ -183,8 +182,7 @@ class SnakeAI:
                 pygame.quit()
                 quit()
 
-        # 2. Update Snake Moment and Size by BLOCK
-        self._move(action)  # update the head
+        self._move(action)
         self.snake.insert(0, self.head)
 
         # 3. check if game over
@@ -201,12 +199,17 @@ class SnakeAI:
             self.score += 1
             reward = 10
             self._place_food()
+        elif self.head == self.yellow_food:
+            if len(self.snake) > 5:  # Only shorten if the snake has more than one segment
+                self.snake.pop()
+                reward = 20
+            else:
+                reward = 1
+            self._place_food()
         else:
             self.snake.pop()
 
-            # 5. update ui and clock
         self._update_ui()
         self.clock.tick(SPEED)
 
-        # 6. return game over and score
         return reward, game_over, self.score
