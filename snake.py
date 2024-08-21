@@ -19,7 +19,8 @@ WHITE1 = (255, 255, 255)
 WHITE2 = (200, 200, 200)
 RED = (200, 0, 0)
 BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
+GREEN1 = (0, 255, 0)
+GREEN2 = (0, 200, 0)
 
 BLOCK_SIZE = 20
 SPEED = 2000
@@ -98,11 +99,17 @@ class SnakeAI:
         return False
 
     def _update_ui(self):
+        is_head = True
         self.display.fill(BLACK)
 
         for pt in self.snake:
-            pygame.draw.rect(self.display, WHITE2, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-            pygame.draw.rect(self.display, WHITE1, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
+            if is_head:
+                pygame.draw.rect(self.display, GREEN2, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+                pygame.draw.rect(self.display, GREEN1, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
+                is_head = False
+            else:
+                pygame.draw.rect(self.display, WHITE2, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+                pygame.draw.rect(self.display, WHITE1, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
 
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
 
