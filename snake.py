@@ -193,7 +193,7 @@ class SnakeAI:
         # Check the length of the snake through frame_iteration incase it doesn't grow
         if self.is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
-            reward = -10
+            reward = -1
             return reward, game_over, self.score
 
         # 4. place new food or just move
