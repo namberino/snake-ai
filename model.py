@@ -4,7 +4,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import os
 
-FILE_PATH = 'model5.pth'
+SAVE_FILE_PATH = 'model12.pth'
 
 #TODO: Learn How to Modify Q-Learning 
 class Linear_QNet(nn.Module):
@@ -20,7 +20,7 @@ class Linear_QNet(nn.Module):
         return x
 
     #? Save Training Result to model.pth (pytorch file format) 
-    def save(self, file_name=FILE_PATH):
+    def save(self, file_name=SAVE_FILE_PATH):
         model_folder_path = './model'
         if not os.path.exists(model_folder_path):
             os.makedirs(model_folder_path)

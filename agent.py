@@ -9,14 +9,14 @@ import os
 import sys
 
 
-MAX_MEMORY = 800_000 # Store n samples. 
-BATCH_SIZE = 1000 # n samples in a batch. 
-LR = 0.0001  # Learning Rate
+MAX_MEMORY = 1_000_000 # Store n samples. 
+BATCH_SIZE = 1111 # n samples in a batch. 
+LR = 0.00001  # Learning Rate
 SPEED = 20000  # Increase the frame rate
 INPUT_SIZE = 12
 HIDDEN_SIZE1 = 256
 OUTPUT_SIZE = 3
-FILE_PATH = 'model/model5.pth'
+FILE_PATH = 'model/model12.pth'
 ARGS = sys.argv
 
 class Agent:
